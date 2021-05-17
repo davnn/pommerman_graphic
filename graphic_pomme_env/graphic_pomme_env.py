@@ -31,6 +31,21 @@ class PommeGraphic(Pomme):
         self.renres = load_resources(self.sprite_size)
         self.lastobs_raw = None
 
+    def set_num_board_params(self, num_rigid:int=-1, num_wood:int=-1, num_items:int=-1):
+        if num_rigid > 0:
+            assert num_rigid % 2 == 0, "Requires an even number of rigid tiles"
+            assert num_rigid >= 2, "The minimum number of rigid tiles that does not result in a crash is 2."
+            self._num_rigid = num_rigid
+        if num_wood > 0:
+            assert num_wood % 2 == 0, "Requires an even number of wood tiles"
+            assert num_wood >= 6, "The minimum number of wood tiles that does not result in a crash is 6."
+            if self.spec.id == 'GraphicOneVsOne-v0':
+                assert num_wood >= 10, "Minimum number of wood tiles for 8x8 board is 10."
+            self._num_wood = num_wood
+        if num_items > 0:
+            assert num_items < self._num_wood, "Number of items shouls  be at most equal to the number of blocks."
+            self._num_items = num_items
+
     def redraw(self, obs):
         # add agents own id to each observation, assume that they are mapped according to their position in the list
         for i, o in enumerate(obs):
