@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='graphic_pomme_env',
+    name='pommerman_graphic',
     version='0.1.0',    
     description='An addition to the pommerman multiplayer env, supporting image observations.',
     url='TODO',
