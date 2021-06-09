@@ -135,12 +135,6 @@ class PommerEnvWrapperFrameSkip2():
 
         self.opponent_actor = opponent_actor
 
-        if not opponent_actor:
-            self.opponent = SimpleAgent()
-        else:
-            # Random agent serves as dummy; get the actions from opponent_actor function
-            self.opponent = RandomAgent()
-
     def set_opponent_actor(self, opponent_actor):
         self.opponent_actor = opponent_actor
 
@@ -152,29 +146,24 @@ class PommerEnvWrapperFrameSkip2():
 
         if start_pos == 0:
             self.cur_start_pos = 0
-            agent_list = [RandomAgent(), self.opponent]
+            agent_list = [RandomAgent(), self.opponent_actor]
         elif start_pos == 1:
             self.cur_start_pos = 1
-            agent_list = [self.opponent, RandomAgent()]
+            agent_list = [self.opponent_actor, RandomAgent()]
 
         self.env = make(self.board, agent_list=agent_list,
                         render_mode='pixel_array')
 
     def print_cur_start_pos(self):
         if self.start_pos == -1:
-            print(
-                f"Random assignment of starting position - current start position: {self.cur_start_pos}")
+            print(f"Random assignment of starting position - current start position: {self.cur_start_pos}")
 
     def step(self, action):
         # get opponent action
-        if not self.opponent_actor:
-            raw_obs_list = self.env.get_last_step_raw()
-            opponent_action = self.opponent.act(
-                raw_obs_list[1 - self.cur_start_pos],
-                NUM_ACTIONS)  # for SimpleAgent
-        else:
-            oppon_frame_stack = self.oppon_frame_stack_even if self.next_is_even else self.oppon_frame_stack_odd
-            opponent_action = self.opponent_actor(oppon_frame_stack)
+        raw_obs_list = self.env.get_last_step_raw()
+        opponent_action = self.opponent_actor.act(
+            raw_obs_list[1 - self.cur_start_pos],
+            NUM_ACTIONS)  # opponent is acting with state
 
         if self.cur_start_pos == 0:
             action_list = [action, opponent_action]

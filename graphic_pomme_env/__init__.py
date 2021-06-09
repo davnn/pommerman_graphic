@@ -106,11 +106,7 @@ def custom_ovo_nano():
 if __name__ == '__main__':
     raise Exception('Is a library')
 else:
-    print(sys.path)
-    print(os.path.dirname(os.path.dirname(__file__)))
     sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
-    print(sys.path)
-
     for config in [custom_conf(), custom_one_vs_one_env(), custom_ovo_compact(), custom_ovo_nano()]:
         REGISTRY.append(config['env_id'])
         register(
@@ -118,4 +114,4 @@ else:
             entry_point=config['env_entry_point'],
             kwargs=config['env_kwargs']
         )
-        print("{} env is registered.".format(config['env_id']))
+        # print("{} env is registered.".format(config['env_id']))
