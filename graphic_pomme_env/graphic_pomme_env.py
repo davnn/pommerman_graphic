@@ -9,7 +9,7 @@ import PIL.Image
 import numpy as np
 from PIL import Image
 
-from typing import Tuple, List, Dict
+from typing import List, Dict
 
 from gym.error import ResetNeeded
 

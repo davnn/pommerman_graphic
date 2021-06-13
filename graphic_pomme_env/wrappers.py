@@ -1,7 +1,10 @@
 from collections import deque
+
+import gym
 import numpy as np
 from pommerman import make
-from pommerman.agents import RandomAgent, SimpleAgent
+from pommerman.agents import RandomAgent
+from pommerman.envs.v0 import Pomme
 
 # FrameStack implementation
 # leaned on https://github.com/openai/gym/blob/master/gym/wrappers/frame_stack.py
@@ -19,10 +22,13 @@ NUM_ACTIONS = 6
 5 Bomb
 '''
 
+ACTION_SPACE = gym.spaces.Discrete(NUM_ACTIONS)
+
+
 def rgb2grayscale(rgb_img_numpy):
-  rgb_weights = [0.2989, 0.5870, 0.1140]
-  grayscale_image = np.dot(rgb_img_numpy[...,:3], rgb_weights)
-  return grayscale_image
+    rgb_weights = [0.2989, 0.5870, 0.1140]
+    grayscale_image = np.dot(rgb_img_numpy[..., :3], rgb_weights)
+    return grayscale_image
 
 
 class LazyFrames(object):
@@ -90,6 +96,7 @@ class FrameStack():
     .. note::
 
     """
+
     def __init__(self, num_stack, lz4_compress=False):
         self.num_stack = num_stack
         self.lz4_compress = lz4_compress
@@ -123,7 +130,6 @@ class PommerEnvWrapperFrameSkip2():
 
     def __init__(self, num_stack, start_pos=0, opponent_actor=None,
                  board='GraphicOneVsOne-v0'):
-
         self.num_stack = num_stack
         self.start_pos = start_pos
         self.env = None
@@ -132,7 +138,6 @@ class PommerEnvWrapperFrameSkip2():
         self.oppon_frame_stack_even = FrameStack(num_stack)
         self.oppon_frame_stack_odd = FrameStack(num_stack)
         self.board = board
-
         self.opponent_actor = opponent_actor
 
     def set_opponent_actor(self, opponent_actor):
@@ -151,8 +156,7 @@ class PommerEnvWrapperFrameSkip2():
             self.cur_start_pos = 1
             agent_list = [self.opponent_actor, RandomAgent()]
 
-        self.env = make(self.board, agent_list=agent_list,
-                        render_mode='pixel_array')
+        self.env = make(self.board, agent_list=agent_list, render_mode="pixel_array")
 
     def print_cur_start_pos(self):
         if self.start_pos == -1:
@@ -161,9 +165,8 @@ class PommerEnvWrapperFrameSkip2():
     def step(self, action):
         # get opponent action
         raw_obs_list = self.env.get_last_step_raw()
-        opponent_action = self.opponent_actor.act(
-            raw_obs_list[1 - self.cur_start_pos],
-            NUM_ACTIONS)  # opponent is acting with state
+        # opponent is acting with state
+        opponent_action = self.opponent_actor.act(raw_obs_list[1 - self.cur_start_pos], ACTION_SPACE)
 
         if self.cur_start_pos == 0:
             action_list = [action, opponent_action]
@@ -191,9 +194,9 @@ class PommerEnvWrapperFrameSkip2():
         self.next_is_even = not self.next_is_even
 
         agent_ret = (
-        observation_stack, reward_list[self.cur_start_pos], done, info)
+            observation_stack, reward_list[self.cur_start_pos], done, info)
         opponent_ret = (
-        oppon_obs_stack, reward_list[1 - self.cur_start_pos], done, info)
+            oppon_obs_stack, reward_list[1 - self.cur_start_pos], done, info)
 
         return agent_ret, opponent_ret
 
